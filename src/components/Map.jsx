@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import '../Styles/Home.css';
-import { getDatabase, ref, child, get } from "firebase/database";
+import { getDatabase, ref, child, get, onValue } from "firebase/database";
+import 'firebase/database';
 
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2VhbXN1cXIiLCJhIjoiY2wxOXc4Y3QwMTIzazNqbnd3ZXYyNmZsMyJ9.8QvIQjNW74qt9aE6K-6b7A';
@@ -15,6 +16,7 @@ export default function Home() {
     const [lat, setLat] = useState('');
     const [zoom, setZoom] = useState('');
     const coordinate =[];
+    var database = firebase.database;
 
     useEffect(() => {
         if (map.current) return; 
@@ -27,9 +29,9 @@ export default function Home() {
     });
     // reload this code
     // listen to realtime database
-
-    const dbRef = ref(getDatabase());
-    get(child(dbRef, 'Online Riders/1234')).then(snapshot => {
+    const db = getDatabase();
+    const dbRef = database.ref(db, '/Online Riders'+ '/1234');
+    dbRef.on('value', (snapshot) => {
       const data = snapshot.val();
       // go in the userIds array and get the Latitude , Longitude and Name
       const userIds = Object.keys(data);
@@ -53,12 +55,24 @@ export default function Home() {
         }
       });
       coordinate.forEach(marker => {
-        new mapboxgl.Marker()
-        .setLngLat(marker.geometry.coordinates)
-        // create a popup for every marker
-        .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
-        .setHTML(`<h3>${marker.properties.title}</h3><p>${marker.properties.description}</p><p>${marker.Duration}</p>`))
-        .addTo(map.current);
+        // if the marker is not empty
+        if (marker) {
+          // create a new marker 
+          new mapboxgl.Marker()
+          .setLngLat(marker.geometry.coordinates)
+          // create a popup for every marker
+          .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+          .setHTML(`<h3>${marker.properties.title}</h3><p>${marker.properties.description}</p><p>${marker.Duration}</p>`))
+          .addTo(map.current);
+        }
+        // else update the marker
+        else {
+          const marker = new mapboxgl.Marker()
+          .setLngLat(marker.geometry.coordinates)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+          .setHTML(`<h3>${marker.properties.title}</h3><p>${marker.properties.description}</p><p>${marker.Duration}</p>`))
+          .addTo(map.current);
+        }
       });
     });
     
