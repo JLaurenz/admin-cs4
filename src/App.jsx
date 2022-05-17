@@ -27,7 +27,6 @@ function App() {
         .catch((error) => {
           if(error.code === 'auth/wrong-password'){
             console.log('Please check the Password');
-
           }
           if(error.code === 'auth/user-not-found'){
             console.log('Please check the Email');

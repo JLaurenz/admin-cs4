@@ -4,3 +4,7 @@
   width: 100vw;
   position: fixed;
 }
+
+.mapboxgl-canvas-container.mapboxgl-interactive, .mapboxgl-ctrl-group button.mapboxgl-ctrl-compass{
+  cursor: default;
+}
