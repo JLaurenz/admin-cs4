@@ -16,17 +16,7 @@ export default function Home() {
     const [zoom, setZoom] = useState('');
     const coordinate =[];
 
-    useEffect(() => {
-        if (map.current) return; 
-        map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [121.4692, 14.1407],
-        zoom: 10
-        });
-    });
-    // reload this code
-    // listen to realtime database
+
     const db = getDatabase();
     const dbRef = ref(db, '/Online Riders'+ '/1234');
     onValue(dbRef, (snapshot) => {
@@ -39,8 +29,10 @@ export default function Home() {
         // push to coordinate array if the Latitude and Longitude is not empty
         if (Latitude && Longitude) {
           // if duration is empty, set it to 0
+          // create a random color for the marker
+          const color = Duration ? '#' + Math.floor(Math.random() * 16777215).toString(16) : '#000000';
           coordinate.push({
-            Duration,
+            // push a json object
             type: 'Feature',
             geometry: {
               type: 'Point',
@@ -48,19 +40,38 @@ export default function Home() {
             },
             properties: {
               title: Name,
-              description: 'Current Location'
+              description: Duration,
+              'marker-color': color,
+              'marker-size': 'medium',
+              'marker-symbol': 'marker'
             }
           });
         }
-      });
-      coordinate.forEach(marker => {
-        new mapboxgl.Marker()
-        .setLngLat(marker.geometry.coordinates)
-        // create a popup for every marker
-        .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
-        .setHTML(`<h3>${marker.properties.title}</h3><p>${marker.properties.description}</p><p>${marker.Duration}</p>`))
-        .addTo(map.current);
-      });
+        }
+      );
+    });
+    // loop through the coordinate array and add marker to the map
+    coordinate.forEach(coordinate => {
+      // check if the marker is still on the map
+      if (map.current) {
+        // create a new marker
+        const marker = new mapboxgl.Marker(coordinate);
+        // add the marker to the map
+        marker.setLngLat(coordinate.geometry.coordinates).addTo(map.current);
+      }
+    });
+    
+  
+
+
+    useEffect(() => {
+        if (map.current) return; 
+        map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [121.4000, 14.2507],
+        zoom: 14
+        });
     });
 
     useEffect(() => {
