@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/Home.css';
 import Map from '../components/Map.jsx';
+import MenuIcon from '@mui/icons-material/Menu';
 export default function Home() {
 
     
@@ -21,6 +22,7 @@ export default function Home() {
     return (
         <div className="container">
             <div className="content">
+                
                 <div className="heading-container">
                     <Map />
                 </div>

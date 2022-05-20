@@ -17,51 +17,6 @@ export default function Home() {
     const coordinate =[];
 
 
-    const db = getDatabase();
-    const dbRef = ref(db, '/Online Riders'+ '/1234');
-    onValue(dbRef, (snapshot) => {
-      const data = snapshot.val();
-      // go in the userIds array and get the Latitude , Longitude and Name
-      const userIds = Object.keys(data);
-      userIds.forEach(userId => {
-        const user = data[userId];
-        const {Duration, Latitude, Longitude, Name } = user;
-        // push to coordinate array if the Latitude and Longitude is not empty
-        if (Latitude && Longitude) {
-          // if duration is empty, set it to 0
-          // create a random color for the marker
-          const color = Duration ? '#' + Math.floor(Math.random() * 16777215).toString(16) : '#000000';
-
-          coordinate.push({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [Longitude, Latitude]
-            },
-            properties: {
-              title: Name,
-              description: Duration,
-              'marker-color': color,
-              'marker-size': 'medium'
-            }
-          });
-        }
-        }
-      );
-    });
-    
-    coordinate.forEach(element => {
-      console.log(element);
-    });
-
-    coordinate.forEach(coordinate => {
-      if (map.current) {
-        const marker = new mapboxgl.Marker(coordinate.properties.color);
-        marker.setLngLat(coordinate.geometry.coordinates).addTo(map.current);
-        marker.setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(coordinate.properties.title + '<br>' + coordinate.properties.description));
-      }
-    });
-    
     useEffect(() => {
         if (map.current) return; 
         map.current = new mapboxgl.Map({
