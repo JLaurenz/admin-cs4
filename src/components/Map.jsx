@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl'; // eslint-disable-line import/no-webpack-loade
 import '../Styles/Home.css';
 import { getDatabase, ref, onValue} from "firebase/database";
 import 'firebase/database';
-import { duration } from '@mui/material';
+import { duration, List } from '@mui/material';
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2VhbXN1cXIiLCJhIjoiY2wxOXc4Y3QwMTIzazNqbnd3ZXYyNmZsMyJ9.8QvIQjNW74qt9aE6K-6b7A';
 
 export default function Home() {
@@ -31,6 +31,7 @@ export default function Home() {
           // if duration is empty, set it to 0
           // create a random color for the marker
           const color = Duration ? '#' + Math.floor(Math.random() * 16777215).toString(16) : '#000000';
+
           coordinate.push({
             type: 'Feature',
             geometry: {
@@ -41,18 +42,21 @@ export default function Home() {
               title: Name,
               description: Duration,
               'marker-color': color,
-              'marker-size': 'medium',
-              'marker-symbol': 'marker'
+              'marker-size': 'medium'
             }
           });
         }
         }
       );
     });
-    // loop through the coordinate array and add marker to the map
+    
+    coordinate.forEach(element => {
+      console.log(element);
+    });
+
     coordinate.forEach(coordinate => {
       if (map.current) {
-        const marker = new mapboxgl.Marker(coordinate);
+        const marker = new mapboxgl.Marker(coordinate.properties.color);
         marker.setLngLat(coordinate.geometry.coordinates).addTo(map.current);
         marker.setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(coordinate.properties.title + '<br>' + coordinate.properties.description));
       }
