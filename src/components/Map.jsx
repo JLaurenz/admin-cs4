@@ -32,7 +32,6 @@ export default function Home() {
           // create a random color for the marker
           const color = Duration ? '#' + Math.floor(Math.random() * 16777215).toString(16) : '#000000';
           coordinate.push({
-            // push a json object
             type: 'Feature',
             geometry: {
               type: 'Point',
@@ -52,18 +51,13 @@ export default function Home() {
     });
     // loop through the coordinate array and add marker to the map
     coordinate.forEach(coordinate => {
-      // check if the marker is still on the map
       if (map.current) {
-        // create a new marker
         const marker = new mapboxgl.Marker(coordinate);
-        // add the marker to the map
         marker.setLngLat(coordinate.geometry.coordinates).addTo(map.current);
+        marker.setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(coordinate.properties.title + '<br>' + coordinate.properties.description));
       }
     });
     
-  
-
-
     useEffect(() => {
         if (map.current) return; 
         map.current = new mapboxgl.Map({
