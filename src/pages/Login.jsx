@@ -88,7 +88,7 @@ export default function SignIn() {
             Sign in
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-						<TextField margin="normal" required fullWidth id="Email" label="Email " name="Email" autoComplete="email" autoFocus onChange={(e) => setEmail(e.target.value)}/>
+						<TextField margin="normal" required fullWidth id="Email" label="Company Email " name="Email" autoComplete="email" autoFocus onChange={(e) => setEmail(e.target.value)}/>
             <TextField margin="normal" required fullWidth  id="Password" label="Password"  name="Password" type="password" autoComplete="new-password" onChange={(e) => setPassword(e.target.value)}/>
             <FormControlLabel control={<Checkbox value="remember" color="primary" onChange={(e) => setIsChecked(true)} />} label="Remember me" />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>

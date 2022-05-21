@@ -14,35 +14,16 @@ export default function Home() {
   const coordinate =[];
 
   const db = getDatabase();
-  let dbRef = ref(db, 'Online Riders');
 
-  // get realtime data from firebase
-  const ref = db.ref('/');
-  const onValue = ref.on('value', (snapshot => {
-    const data = snapshot.val();
-    const keys = [];
-    for (let key in data) {
-      // push the next data after the key
-      keys.push(key);
-      coordinate.push({
-        name: data[key].Name,
-        duration: data[key].Duration,
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [data[key].Longtitude, data[key].Latitude]
-      },
-      properties: {
-          title: data[key].Name,
-          description: data[key].Duration,
-          'color': '#' + Math.floor(Math.random() * 16777215).toString(16),
-          'marker-size': 'medium',
-          'marker-symbol': 'marker'
-      }
-      });
-    }
-  }));
-  
+  useEffect(() => {
+    if (map.current) return; 
+    map.current = new mapboxgl.Map({
+    container: mapContainer.current,
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [121.5010, 14.3507],
+    zoom: 11
+    });
+});
 
 
   useEffect(() => {

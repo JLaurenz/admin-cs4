@@ -26,8 +26,8 @@ export default function Home() {
     <div className="container">
       <div className="content">
         <div className="heading-container">
-            <div className="heading">
-              <MenuIcon fontSize="medium"/>
+            <div className="Nav">
+                <MenuIcon onClick={handleLogout} />
             </div>
         </div>
         <div className="map-container">
