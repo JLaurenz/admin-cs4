@@ -11,29 +11,77 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { app } from '../firebase-config';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const theme = createTheme();
 
+// create toast notification
+const notify = (message, type) => {
+  toast(message, {
+    position: toast.POSITION.TOP_CENTER,
+    autoClose: 2500,
+    type: type
+  });
+};
+
 export default function SignUp() {
+  const [CompanyName, setCompanyName] = useState(''); 
 	const [Email, setEmail] = useState('');
 	const [Password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	const [CompanyName, setCompanyName] = useState('');
+	
+  const auth = getAuth();
+  const handleCompanyNameChange = (event) => { setCompanyName(event.target.value); };
+  const handleEmailChange = (event) => { setEmail(event.target.value); };
+  const handlePasswordChange = (event) => { setPassword(event.target.value); };
+  const handleConfirmPasswordChange = (event) => { setConfirmPassword(event.target.value); };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('setEmail'),
-      password: data.get('Password'),
-    });
+    if (CompanyName === '' || Email === '' || Password === '' || confirmPassword === '') {
+      notify('Please fill in all fields', 'error');
+    } else if (Password !== confirmPassword) {
+      notify('Passwords do not match', 'error');
+    } else {
+      // create random four digit number
+      const randomNumber = Math.floor(1000 + Math.random() * 9000);
+      const randomNumberString = randomNumber.toString();
+      createUserWithEmailAndPassword(auth, Email, Password)
+        .then((randomNumberString) => {
+          app.firestore().collection('Company Code').doc(randomNumberString).set({
+            CompanyName,
+            Email,
+            Password,
+            randomNumberString,
+          });
+        })
+        .catch((error) => {
+          if (error.code === 'auth/email-already-in-use') {
+            notify('Email already in use ', 'error');
+          } else if (error.code === 'auth/invalid-email') {
+            notify('Invalid email address', 'error');
+          } else if (error.code === 'auth/weak-password') {
+            notify('Password is too weak', 'error');
+          } else {
+            console.log(error);
+          }
+        });
+
+    }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="xs" >
+        <ToastContainer />
         <CssBaseline />
-        <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+        <Box sx={{ marginTop: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
@@ -43,16 +91,16 @@ export default function SignUp() {
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField required fullWidth id="CompanyName" label="Company Name" name="CompanyName" autoComplete="company-name" />
+                <TextField required fullWidth id="CompanyName" label="Company Name" name="CompanyName" autoComplete="company-name" onChange={(e) => setCompanyName(e.target.value)}/>
               </Grid>
               <Grid item xs={12}>
-								<TextField required fullWidth id="email" label="CompanyEmail " name="email" autoComplete="email" autoFocus onChange={(e) => setEmail(e.target.value)} />
+								<TextField required fullWidth id="Email" label="Email " name="Email" autoComplete="email" onChange={(e) => setEmail(e.target.value)}/>
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth name="Password" label="Password" type="password" id="password" autoComplete="new-password" />
+                <TextField required fullWidth  id="Password" label="Password"  name="Password" type="password" autoComplete="new-password" onChange={(e) => setPassword(e.target.value)}/>
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth name="ConfirmPassword" label="Confirm Password" type="password" id="ConfirmPassword" autoComplete="confirm-password" />
+                <TextField required fullWidth id="ConfirmPassword" label="Confirm Password"  name="ConfirmPassword" type="password" autoComplete="confirm-password" onChange={(e) => setConfirmPassword(e.target.value)}/>
               </Grid>
             </Grid>
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
