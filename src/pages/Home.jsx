@@ -3,30 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import '../Styles/Home.css';
 import Map from '../components/Map.jsx';
 import MenuIcon from '@mui/icons-material/Menu';
+
 export default function Home() {
+  let navigate = useNavigate();
 
-    
-    let navigate = useNavigate();
+  const handleLogout = () => {
+    sessionStorage.removeItem('Auth Token');
+    navigate('/')
+  }
+  useEffect(() => {
+    let authToken = sessionStorage.getItem('Auth Token')
+    if (authToken) {
+      console.log('logged in')
+      navigate('/home')
+    }
+    if (!authToken) {
+      navigate('/')
+    }
+  }, [])
 
-    useEffect(() => {
-        let authToken = sessionStorage.getItem('Auth Token')
-        if (authToken) {
-            console.log('logged in')
-            navigate('/home')
-        }
-        if (!authToken) {
-            navigate('/')
-        }
-    }, [])
- 
-    return (
-        <div className="container">
-            <div className="content">
-                
-                <div className="heading-container">
-                    <Map />
-                </div>
+  return (
+    <div className="container">
+      <div className="content">
+        <div className="heading-container">
+            <div className="heading">
+              <MenuIcon fontSize="medium"/>
             </div>
         </div>
-    )
+        <div className="map-container">
+          <Map />
+        </div>
+      </div>
+    </div>
+  )
 }

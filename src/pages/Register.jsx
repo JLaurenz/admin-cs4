@@ -12,11 +12,10 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { app } from '../firebase-config';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-
-
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'firebase/firestore';
 
 
 const theme = createTheme();
@@ -53,13 +52,13 @@ export default function SignUp() {
       const randomNumber = Math.floor(1000 + Math.random() * 9000);
       const randomNumberString = randomNumber.toString();
       createUserWithEmailAndPassword(auth, Email, Password)
-        .then((randomNumberString) => {
-          app.firestore().collection('Company Code').doc(randomNumberString).set({
-            CompanyName,
-            Email,
-            Password,
-            randomNumberString,
+        .then(() => {
+          // create new document in collection
+          app.firestore().collection('OnlineRiders').doc(randomNumberString).set({
+            CompanyName: CompanyName,
+            Key: CompanyName.toLowerCase(),
           });
+          notify('Account created successfully', 'success');
         })
         .catch((error) => {
           if (error.code === 'auth/email-already-in-use') {
