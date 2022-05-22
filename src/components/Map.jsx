@@ -43,10 +43,13 @@ export default function Home() {
     setInterval(() => {
       coordinate.forEach(coordinate => {
         if (ListMarker.hasOwnProperty(coordinate.properties.title)) {
-          // update the marker location
-          ListMarker[coordinate.properties.title].setLngLat(coordinate.geometry.coordinates)
+          // remove marker from map
+          ListMarker[coordinate.properties.title].remove();
+          const {title, description, 'marker-color': color } = coordinate.properties;
+          const newMarker = new mapboxgl.Marker({ color })
+          .setLngLat(coordinate.geometry.coordinates)
           .setPopup(new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`<h3>${coordinate.properties.title}</h3><p>${coordinate.properties.description}</p>`))
+            .setHTML(`<h3>${title}</h3><p>${description}</p>`))
           .addTo(map.current);
 
         }
@@ -60,7 +63,7 @@ export default function Home() {
           ListMarker[title] = newMarker;
         }
       });
-    }, 500);
+    }, 1000);
   }
 
   
