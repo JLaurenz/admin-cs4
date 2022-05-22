@@ -11,11 +11,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { app } from '../firebase-config';
+import {db, app} from '../firebase-config';
+import {collection, setDoc, doc, Timestamp} from 'firebase/firestore'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
+import { useNavigate } from 'react-router-dom';
+
 
 
 const theme = createTheme();
@@ -27,18 +29,23 @@ const notify = (message, type) => {
   });
 };
 
+
+
 export default function SignUp() {
   const [CompanyName, setCompanyName] = useState(''); 
 	const [Email, setEmail] = useState('');
 	const [Password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	
-  const db = getFirestore(app);
+
   const auth = getAuth();
+  let navigate = useNavigate();
   const handleCompanyNameChange = (event) => { setCompanyName(event.target.value); };
   const handleEmailChange = (event) => { setEmail(event.target.value); };
   const handlePasswordChange = (event) => { setPassword(event.target.value); };
   const handleConfirmPasswordChange = (event) => { setConfirmPassword(event.target.value); };
+
+  // get firestore collection
+  const storage = collection(db, 'Company Code');
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -50,10 +57,20 @@ export default function SignUp() {
       // create random four digit number
       const randomNumber = Math.floor(1000 + Math.random() * 9000);
       const randomNumberString = randomNumber.toString();
+
       createUserWithEmailAndPassword(auth, Email, Password)
         .then(() => {
-          
-          notify('Account created successfully', 'success');
+          setDoc(doc(db, "Company Code", randomNumberString), { CompanyName: CompanyName, Key: CompanyName.toLowerCase() })
+          .catch(() => {
+            const randomNumber = Math.floor(1000 + Math.random() * 9000);
+            const randomNumberString = randomNumber.toString();
+            setDoc(doc(db, "Company Code", randomNumberString), { CompanyName: CompanyName, Key: CompanyName.toLowerCase() })
+          })
+          notify('Account created', 'success');
+          // navigate to login page after 5 seconds
+          setTimeout(() => {
+            navigate('/');
+          }, 2500);
         })
         .catch((error) => {
           if (error.code === 'auth/email-already-in-use') {
@@ -66,7 +83,6 @@ export default function SignUp() {
             console.log(error);
           }
         });
-
     }
   };
 
