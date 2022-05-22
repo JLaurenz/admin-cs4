@@ -15,12 +15,10 @@ import { app } from '../firebase-config';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import 'firebase/firestore';
+const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
 
 
 const theme = createTheme();
-
-// create toast notification
 const notify = (message, type) => {
   toast(message, {
     position: toast.POSITION.TOP_CENTER,
@@ -35,6 +33,7 @@ export default function SignUp() {
 	const [Password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	
+  const db = getFirestore(app);
   const auth = getAuth();
   const handleCompanyNameChange = (event) => { setCompanyName(event.target.value); };
   const handleEmailChange = (event) => { setEmail(event.target.value); };
@@ -53,11 +52,7 @@ export default function SignUp() {
       const randomNumberString = randomNumber.toString();
       createUserWithEmailAndPassword(auth, Email, Password)
         .then(() => {
-          // create new document in collection
-          app.firestore().collection('OnlineRiders').doc(randomNumberString).set({
-            CompanyName: CompanyName,
-            Key: CompanyName.toLowerCase(),
-          });
+          
           notify('Account created successfully', 'success');
         })
         .catch((error) => {

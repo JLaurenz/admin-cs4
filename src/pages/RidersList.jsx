@@ -5,7 +5,7 @@ import Map from '../components/Map.jsx';
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from '../components/Sidebar.jsx';
 
-export default function Home() {
+export default function RidersList() {
   let navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -21,27 +21,11 @@ export default function Home() {
     sessionStorage.removeItem('Auth Token');
     navigate('/')
   }
-  useEffect(() => {
-    let authToken = sessionStorage.getItem('Auth Token')
-    if (authToken) {
-      console.log('logged in')
-      navigate('/home')
-    }
-    if (!authToken) {
-      navigate('/')
-    }
-  }, [])
-
   return (
     <div className="container">
       <div className="heading-container">
         <div className="Nav">
           <Sidebar />
-        </div>
-      </div>
-      <div className="content">
-        <div className="map-container">
-          <Map />
         </div>
       </div>
     </div>
