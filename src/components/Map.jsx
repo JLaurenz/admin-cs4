@@ -10,7 +10,7 @@ export default function Home() {
   const [lng, setLng] = useState('');
   const [lat, setLat] = useState('');
   const [zoom, setZoom] = useState('');
-  const coordinate =[];
+  const color =[];
   const ListMarker = [];
   const db = getDatabase();
   const dbRef = ref(db, '/Online Riders'+ '/1234');
@@ -19,59 +19,35 @@ export default function Home() {
     const userIds = Object.keys(data);
     userIds.forEach(userId => {
       const user = data[userId];
-      
       const {Duration, Latitude, Longitude, Name } = user;
       if (Latitude && Longitude) {
-        const color = Duration ? '#' + Math.floor(Math.random() * 16777215).toString(16) : '#000000';
-        coordinate.push({
-          status: 'offline',
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [Longitude, Latitude]
-          },
-          properties: {
-            title: Name,
-            description: Duration,
-            'marker-color': color,
-            'marker-size': 'medium',
-            'marker-symbol': 'marker',
+        // generate a random color for each marker
+        const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        setInterval(() => {
+          if (ListMarker.hasOwnProperty(Name)) {
+            console.log('hasOwnProperty', Name);
+            ListMarker[Name].setLngLat([Longitude, Latitude])
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
+            .addTo(map.current);
+
           }
-        });
+          else {
+            console.log('not hasOwnProperty', Name);
+            const newMarker = new mapboxgl.Marker({
+              color,
+              size: 'small'
+            })
+            .setLngLat([Longitude, Latitude])
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
+            .addTo(map.current);
+            ListMarker[Name] = newMarker;
+          }
+        }, 1000);
       }
     });
-    setInterval(() => {
-      // if coordinate status is offline, create a new marker
-      coordinate.forEach(coordinate => {
-        if (coordinate.hasOwnProperty('status') && coordinate.status === 'offline') {
-          const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
-          const newMarker = new mapboxgl.Marker({
-            color,
-            size,
-            symbol
-          })
-          .setLngLat(coordinate.geometry.coordinates)
-          .setPopup(new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`<h3>${title}</h3><p>${description}</p>`))
-          .addTo(map.current);
-          ListMarker.push(newMarker);
-          coordinate.properties.status = 'Online';
-        }
-        else {
-          const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
-          ListMarker.forEach(marker => {
-            if (marker.getPopup().getElement().innerHTML.includes(title)) {
-              marker.setLngLat(coordinate.geometry.coordinates)
-              .setPopup(new mapboxgl.Popup({ offset: 25 })
-                .setHTML(`<h3>${title}</h3><p>${description}</p>`))
-              .addTo(map.current);
-            }
-          });
-        }
-      });
-    }, 1000);
   });
-
 
   useEffect(() => {
     if (map.current) return; 
