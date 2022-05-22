@@ -5,12 +5,12 @@ import SportsMotorsportsSharpIcon from '@mui/icons-material/SportsMotorsportsSha
 import InfoSharpIcon from '@mui/icons-material/InfoSharp';
 
 export const SidebarData = [
-    // {
-    //     title: 'Home',
-    //     path: '/home',
-    //     icon: <MUIIcon.HomeSharp />,
-    //     cName: 'nav-text'
-    // },
+    {
+        title: 'Home',
+        path: '/home',
+        icon: <MUIIcon.HomeSharp />,
+        cName: 'nav-text'
+    },
     // {
     //     title: 'RidersList',
     //     path: '/riderslist',

@@ -25,22 +25,21 @@ export default function Home() {
       if (Latitude !== 0 && Longitude !== 0 && Duration !== 0) {
         setInterval(() => {
           if (ListMarker.hasOwnProperty(Name)) {
+            ListMarker[Name].removeMarker();
             ListMarker[Name].setLngLat([Longitude, Latitude])
             .setPopup(new mapboxgl.Popup({ offset: 25 })
               .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
             .addTo(map.current);
           }
           else {
-            const newMarker = new mapboxgl.Marker({
-              color
-            })
+            const newMarker = new mapboxgl.Marker({color})
             .setLngLat([Longitude, Latitude])
             .setPopup(new mapboxgl.Popup({ offset: 25 })
               .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
             .addTo(map.current);
             ListMarker[Name] = newMarker;
           }
-        }, 1000);
+        }, 3000);
       }
     });
   });

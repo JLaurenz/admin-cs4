@@ -1,3 +1,22 @@
+.Nav {
+  background-color: rgba(255, 255, 255, .15);  
+  backdrop-filter: blur(5px);
+  color: rgb(0, 0, 0);
+  padding: 5px 12px;
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 12px;
+  border-radius: 4px;
+  }
+.Nav ul{
+  list-style-type: none;
+}
+.Nav ul a{
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+}
 .map-container {
   margin-left: auto;
   height: 100vh;
