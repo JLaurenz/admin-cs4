@@ -27,28 +27,31 @@ export default function Home() {
         });
     });
 
-    for (let key in data) {
-        // push the next data after the key
-        keys.push(key);
-        coordinate.push({
-          name: data[key].Name,
-          duration: data[key].Duration,
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [data[key].Longtitude, data[key].Latitude]
-        },
-        properties: {
-            title: data[key].Name,
-            description: data[key].Duration,
-            'color': '#' + Math.floor(Math.random() * 16777215).toString(16),
-            'marker-size': 'medium',
-            'marker-symbol': 'marker'
-        }
+    setInterval(() => {
+        // if coordinate status is offline, create a new marker
+        coordinate.forEach(coordinate => {
+          if (coordinate.hasOwnProperty('status') && coordinate.status === 'offline') {
+            const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
+            const newMarker = new mapboxgl.Marker({
+              color,
+              size,
+              symbol
+            })
+            .setLngLat(coordinate.geometry.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`<h3>${title}</h3><p>${description}</p>`))
+            .addTo(map.current);
+            ListMarker.push(newMarker);
+            coordinate.properties.status = 'Online';
+          }
+          else {
+            ListMarker[title].setLngLat(coordinate.geometry.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`<h3>${title}</h3><p>${description}</p>`))
+            .addTo(map.current);
+          }
         });
-      }
-    });
-
+      }, 1000);
     
 
     useEffect(() => {

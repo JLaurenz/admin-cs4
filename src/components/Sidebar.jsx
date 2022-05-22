@@ -11,13 +11,12 @@ function Sidebar() {
   const toggleSidebar = () => setSideBar (!sidebar);
 
   let navigate = useNavigate();
+  console.log(sidebar);
   
   const handleLogout = () => {
       sessionStorage.removeItem('Auth Token');
       navigate('/');
   }
-
-
 
   return (
   <>
@@ -34,7 +33,6 @@ function Sidebar() {
             <li key={index} className={item.cName}>
               <Link to={item.path}>
                 {item.icon}
-                <span className='Menu-text'>{item.title}</span>
               </Link>
             </li>
           )
