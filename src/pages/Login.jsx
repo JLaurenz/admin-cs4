@@ -33,12 +33,12 @@ export default function SignIn() {
   let navigate = useNavigate();
   const [Email, setEmail] = useState('');
   const [Password, setPassword] = useState('');
-  const [isChecked, setIsChecked] = useState(false);
   const auth = getAuth();
 
   const handleEmailChange = (event) => { setEmail(event.target.value); };
   const handlePasswordChange = (event) => { setPassword(event.target.value); };
-  const handleCheckboxChange = (event) => { setIsChecked(event.target.checked); };
+
+  // if user is already logged in save the users data to local storage
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -47,15 +47,6 @@ export default function SignIn() {
     } else {
       signInWithEmailAndPassword(auth, Email, Password)
         .then((response) => {
-          if (isChecked) {
-            // remember user
-            localStorage.setItem('email', Email);
-            localStorage.setItem('password', Password);
-          } else {
-            // forget user
-            localStorage.removeItem('email');
-            localStorage.removeItem('password');
-          } 
           navigate('/home');
           sessionStorage.setItem('Auth Token', response._tokenResponse.refreshToken);
         })
@@ -75,6 +66,8 @@ export default function SignIn() {
     }
   };
 
+  // if session storage has email and password, set the state to those values
+
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -90,7 +83,6 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
 						<TextField margin="normal" required fullWidth id="Email" label="Company Email " name="Email" autoComplete="email" autoFocus onChange={(e) => setEmail(e.target.value)}/>
             <TextField margin="normal" required fullWidth  id="Password" label="Password"  name="Password" type="password" autoComplete="new-password" onChange={(e) => setPassword(e.target.value)}/>
-            <FormControlLabel control={<Checkbox value="remember" color="primary" onChange={(e) => setIsChecked(true)} />} label="Remember me" />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Sign In
             </Button>
@@ -98,11 +90,6 @@ export default function SignIn() {
               <Grid item xs>
                 <Link href="/forgotpass" variant="body2">
                   Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/register" variant="body2">
-                  {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
             </Grid>
