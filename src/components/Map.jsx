@@ -39,13 +39,10 @@ export default function Home() {
             .addTo(map.current);
             ListMarker[Name] = newMarker;
           }
-        }, 3000);
+        }, 1000);
       }
     });
   });
-
-
-  
 
   useEffect(() => {
     if (map.current) return; 
