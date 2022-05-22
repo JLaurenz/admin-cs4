@@ -22,49 +22,29 @@ export default function Home() {
     userIds.forEach(userId => {
       const user = data[userId];
       const {Duration, Latitude, Longitude, Name, color } = user;
-      if (Latitude && Longitude) {
-        coordinate.push({
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [Longitude, Latitude]
-          },
-          properties: {
-            title: Name,
-            description: Duration,
-            'marker-color': color,
+      if (Latitude !== 0 && Longitude !== 0 && Duration !== 0) {
+        setInterval(() => {
+          if (ListMarker.hasOwnProperty(Name)) {
+            ListMarker[Name].setLngLat([Longitude, Latitude])
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
+            .addTo(map.current);
           }
-        });
+          else {
+            const newMarker = new mapboxgl.Marker({
+              color
+            })
+            .setLngLat([Longitude, Latitude])
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
+            .addTo(map.current);
+            ListMarker[Name] = newMarker;
+          }
+        }, 1000);
       }
     });
   });
 
-  if (coordinate.length > 0) {
-    setInterval(() => {
-      coordinate.forEach(coordinate => {
-        if (ListMarker.hasOwnProperty(coordinate.properties.title)) {
-          // remove marker from map
-          ListMarker[coordinate.properties.title].remove();
-          const {title, description, 'marker-color': color } = coordinate.properties;
-          const newMarker = new mapboxgl.Marker({ color })
-          .setLngLat(coordinate.geometry.coordinates)
-          .setPopup(new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`<h3>${title}</h3><p>${description}</p>`))
-          .addTo(map.current);
-
-        }
-        else {
-          const {title, description, 'marker-color': color } = coordinate.properties;
-          const newMarker = new mapboxgl.Marker({ color })
-          .setLngLat(coordinate.geometry.coordinates)
-          .setPopup(new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`<h3>${title}</h3><p>${description}</p>`))
-          .addTo(map.current);
-          ListMarker[title] = newMarker;
-        }
-      });
-    }, 1000);
-  }
 
   
 
