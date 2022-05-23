@@ -22,27 +22,50 @@ export default function Home() {
     userIds.forEach(userId => {
       const user = data[userId];
       const {Duration, Latitude, Longitude, Name, color } = user;
-      if (Latitude !== 0 && Longitude !== 0 && Duration !== 0) {
-        setInterval(() => {
-          if (ListMarker.hasOwnProperty(Name)) {
-            ListMarker[Name].removeMarker();
-            ListMarker[Name].setLngLat([Longitude, Latitude])
-            .setPopup(new mapboxgl.Popup({ offset: 25 })
-              .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
-            .addTo(map.current);
+      if (Latitude !== undefined && Longitude !== undefined) {
+        coordinate.push({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [Longitude, Latitude]
+          },
+          properties: {
+            title: Name,
+            description: Duration,
+            'marker-color': color,
+            'marker-size': 'medium',
+            'marker-symbol': 'marker'
           }
-          else {
-            const newMarker = new mapboxgl.Marker({color})
-            .setLngLat([Longitude, Latitude])
-            .setPopup(new mapboxgl.Popup({ offset: 25 })
-              .setHTML(`<h3>${Name}</h3><p>${Duration}</p>`))
-            .addTo(map.current);
-            ListMarker[Name] = newMarker;
-          }
-        }, 1000);
+        });
       }
     });
   });
+
+  setInterval(() => {
+    coordinate.forEach(coordinate => {
+      const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
+      if (ListMarker.hasOwnProperty(title)) {
+        ListMarker[title].remove();
+        ListMarker[title].setLngLat(coordinate.geometry.coordinates)
+        .setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`<h3>${title}</h3><p>${description}</p>`))
+        .addTo(map.current);
+        ListMarker[title] = newMarker;
+      }
+      else {
+        const newMarker = new mapboxgl.Marker({
+          color,
+          size,
+          symbol
+        })
+        .setLngLat(coordinate.geometry.coordinates)
+        .setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`<h3>${title}</h3><p>${description}</p>`))
+        .addTo(map.current);
+        ListMarker[title] = newMarker;
+      }
+    });
+  }, 1000);
 
   useEffect(() => {
     if (map.current) return; 
