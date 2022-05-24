@@ -17,7 +17,6 @@ export default function Home() {
   const ListMarker = [];
   const db = getDatabase();
   const coordinate =[];
-  const linetrack = [];
   const dbRef = ref(db, '/Online Riders'+ '/1234');
 
   onValue(dbRef, (snapshot) => {
@@ -51,7 +50,6 @@ export default function Home() {
       const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
       if (coordinate.hasOwnProperty('status') && coordinate.status === 'offline') { return; }
       if (ListMarker.hasOwnProperty(title)) {
-
         const marker = ListMarker[title];
         const markerCoordinate = marker.getLngLat();
         if (markerCoordinate.lat !== coordinate.geometry.coordinates[1] || markerCoordinate.lng !== coordinate.geometry.coordinates[0]) {
@@ -63,18 +61,17 @@ export default function Home() {
       }
       else {
         const newMarker = new mapboxgl.Marker({ color, size, symbol })
-        linelocation[title] = [coordinate.geometry.coordinates];
         newMarker.setLngLat(coordinate.geometry.coordinates)
         newMarker.setPopup(new mapboxgl.Popup({ offset: 25 })
           .setHTML(`<h3>${title}</h3><p>${description}</p>`))
         newMarker.addTo(map.current);
         ListMarker[title] = newMarker;
-        
       }
     });
+    // create a line 
   }, 1000);
 
-
+  console.log(linelocation);
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
@@ -82,15 +79,13 @@ export default function Home() {
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [121.5010, 14.3507],
     zoom: 11
-
-    
     });
 
     if (!map.current) return;
     map.current.on('move', () => {
-    setLng(map.current.getCenter().lng.toFixed(4));
-    setLat(map.current.getCenter().lat.toFixed(4));
-    setZoom(map.current.getZoom().toFixed(2));
+    // setLng(map.current.getCenter().lng.toFixed(4));
+    // setLat(map.current.getCenter().lat.toFixed(4));
+    // setZoom(map.current.getZoom().toFixed(2));
 
     });
 
