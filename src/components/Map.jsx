@@ -57,6 +57,10 @@ export default function Home() {
           marker.setPopup(new mapboxgl.Popup({ offset: 25 })
             .setHTML(`<h3>${title}</h3><p>${description}</p>`))
           marker.addTo(map.current);
+          linelocation.push({
+            title,
+            coordinate: marker.getLngLat()
+          });
         }
       }
       else {
@@ -66,12 +70,15 @@ export default function Home() {
           .setHTML(`<h3>${title}</h3><p>${description}</p>`))
         newMarker.addTo(map.current);
         ListMarker[title] = newMarker;
+        linelocation.push({
+          title,
+          coordinate: newMarker.getLngLat()
+        });
       }
     });
-    // create a line 
   }, 1000);
 
-  console.log(linelocation);
+
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
