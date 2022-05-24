@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import { getDatabase, ref, onValue, DataSnapshot, set, child, get} from "firebase/database";
+import { NotListedLocation } from '@mui/icons-material';
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2VhbXN1cXIiLCJhIjoiY2wxOXc4Y3QwMTIzazNqbnd3ZXYyNmZsMyJ9.8QvIQjNW74qt9aE6K-6b7A';
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
   const ListMarker = [];
   const db = getDatabase();
   const coordinate =[];
+  const geojson = [];
   const dbRef = ref(db, '/Online Riders'+ '/1234');
 
   onValue(dbRef, (snapshot) => {
@@ -24,7 +26,7 @@ export default function Home() {
     const userIds = Object.keys(data);
     userIds.forEach(userId => {
       const user = data[userId];
-      const {Duration, Latitude, Longitude, Name, color } = user;
+      const {Duration, Latitude, Longitude, Name, color, status, route } = user;
       if (Latitude !== undefined && Longitude !== undefined) {
         coordinate.push({
           type: 'Feature',
@@ -38,7 +40,8 @@ export default function Home() {
             'marker-color': color,
             'marker-size': 'medium',
             'marker-symbol': 'marker',
-            'status': 'Online'
+            'status': status,
+            'route': route
           }
         });
       }
@@ -50,6 +53,7 @@ export default function Home() {
       const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
       if (coordinate.hasOwnProperty('status') && coordinate.status === 'offline') { return; }
       if (ListMarker.hasOwnProperty(title)) {
+        
         const marker = ListMarker[title];
         const markerCoordinate = marker.getLngLat();
         if (markerCoordinate.lat !== coordinate.geometry.coordinates[1] || markerCoordinate.lng !== coordinate.geometry.coordinates[0]) {
@@ -59,7 +63,7 @@ export default function Home() {
           marker.addTo(map.current);
           linelocation.push({
             title,
-            coordinate: marker.getLngLat()
+            coordinate: marker.getLngLat(),
           });
         }
       }
@@ -72,13 +76,31 @@ export default function Home() {
         ListMarker[title] = newMarker;
         linelocation.push({
           title,
-          coordinate: newMarker.getLngLat()
+          coordinate: newMarker.getLngLat(),
+          color: color,
         });
       }
     });
+
   }, 1000);
 
-
+  // // get the route from coordinate object
+  // coordinate.forEach(coordinate => {
+  //   console.log(coordinate.properties.route);
+  //   const {title, route, color} = coordinate;
+  //   geojson.push({
+  //     type: 'Feature',
+  //     geometry: {
+  //       type: 'LineString',
+  //       coordinates: route
+  //     },
+  //     properties: {
+  //       title: title,
+  //       color: color,
+  //     }
+  //   });
+  // });
+ 
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
@@ -105,8 +127,7 @@ export default function Home() {
     base1.setPopup(new mapboxgl.Popup({ offset: 25 })
       .setHTML(`<h3>J&T</h3><p>Sta Cruz</p>`))
     base1.addTo(map.current);
-
-
+      
   });
 
   return (
