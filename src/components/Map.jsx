@@ -85,12 +85,7 @@ export default function Home() {
 
   }, 1000);
 
-  coordinate.forEach(coordinate => {
-    if (coordinate.properties.route.length > 0) {
-    coords.push(coordinate.properties.route);
-    }
-  });
- 
+
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
@@ -120,22 +115,41 @@ export default function Home() {
     
   });
 
-  if (coords.length > 0) {  
-    const split_coords = coords.split(',');
+  // loop through the coordinates array and get the route property
+  // and add it to the route array
+  // const routeline = [];
+  // coordinate.forEach(coordinate => {
+  //   if (coordinate.hasOwnProperty('route')) {
+  //     routeline.push(coordinate.route);
+  //   }
+  // });
 
-    var llon = [], llat = [], lcoordinate = [], lcoordinates = [] , lcolor = [];
-    
-    for (var i = 0; i < split_coords.length; i++) {
-      if (i % 2 === 0) {
-        llon.push(split_coords[i]);
-      } else {
-        llat.push(split_coords[i]);
-      }
-    }
+  // const split_coords = routeline.split(',');
 
-    for (var i = 0; i < llon.length; i++) {
-      lcoordinate.push([llon[i], llat[i]]);
-    }
+  // console.log(split_coords);
+
+  // var llon = [], llat = [], lcoordinate = [], lcoordinates = [] , lcolor = [];
+  
+  // // push the coordinate route to coords
+  // linelocation.forEach(linelocation => {
+  //   const {title, coordinate, color} = linelocation;
+  //   lcoordinate.push(coordinate);
+  //   lcoordinates.push(coordinate);
+  //   lcolor.push(color);
+  // });
+  
+  // console.log(lcoordinate);
+  // for (var i = 0; i < split_coords.length; i++) {
+  //   if (i % 2 === 0) {
+  //     llon.push(split_coords[i]);
+  //   } else {
+  //     llat.push(split_coords[i]);
+  //   }
+  // }
+
+  //   for (var i = 0; i < llon.length; i++) {
+  //     lcoordinate.push([llon[i], llat[i]]);
+  //   }
 
     const lgeojson = {
       type: 'FeatureCollection',
@@ -144,7 +158,14 @@ export default function Home() {
           type: 'Feature',
           geometry: {
             type: 'LineString',
-            coordinates: lcoordinate
+            coordinates: [
+              [121.41402295374215 , 14.280144331354549],
+              [121.41402295374215 , 15.280144331354549],
+              [121.41402295374215 , 16.280144331354549],
+              [121.41402295374215 , 17.280144331354549],
+              [121.41402295374215 , 18.280144331354549],
+              [121.41402295374215 , 19.280144331354549],
+            ]
           }
         }
       ]
@@ -171,7 +192,7 @@ export default function Home() {
         });
       });
     });
-  }
+  
 
 
   return (
