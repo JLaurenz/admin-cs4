@@ -83,24 +83,52 @@ export default function Home() {
     });
 
   }, 1000);
-
-  // // get the route from coordinate object
-  // coordinate.forEach(coordinate => {
-  //   console.log(coordinate.properties.route);
-  //   const {title, route, color} = coordinate;
-  //   geojson.push({
-  //     type: 'Feature',
-  //     geometry: {
-  //       type: 'LineString',
-  //       coordinates: route
-  //     },
-  //     properties: {
-  //       title: title,
-  //       color: color,
-  //     }
-  //   });
-  // });
  
+
+  coordinate.forEach(coordinate => {
+    console.log(coordinate.properties.route);
+    const {title, route, color} = coordinate;
+    geojson.push({
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: route
+      },
+      properties: {
+        title: title,
+        color: color,
+      }
+    });
+  });
+ useEffect(() => {
+       // add source to the map
+       map.current.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: [ geojson ]
+          }
+        }
+      });
+      // add the layer to the map
+      map.current.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#888',
+          'line-width': 8
+        }
+      });
+    }, []);
+
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
