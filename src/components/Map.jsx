@@ -18,7 +18,8 @@ export default function Home() {
   const ListMarker = [];
   const db = getDatabase();
   const coordinate =[];
-  const geojson = [];
+  const route = [];
+  const coords = [];
   const dbRef = ref(db, '/Online Riders'+ '/1234');
 
   onValue(dbRef, (snapshot) => {
@@ -84,22 +85,11 @@ export default function Home() {
 
   }, 1000);
 
-  // // get the route from coordinate object
-  // coordinate.forEach(coordinate => {
-  //   console.log(coordinate.properties.route);
-  //   const {title, route, color} = coordinate;
-  //   geojson.push({
-  //     type: 'Feature',
-  //     geometry: {
-  //       type: 'LineString',
-  //       coordinates: route
-  //     },
-  //     properties: {
-  //       title: title,
-  //       color: color,
-  //     }
-  //   });
-  // });
+  coordinate.forEach(coordinate => {
+    if (coordinate.properties.route.length > 0) {
+    coords.push(coordinate.properties.route);
+    }
+  });
  
   useEffect(() => {
     if (map.current) return; 
@@ -127,8 +117,62 @@ export default function Home() {
     base1.setPopup(new mapboxgl.Popup({ offset: 25 })
       .setHTML(`<h3>J&T</h3><p>Sta Cruz</p>`))
     base1.addTo(map.current);
-      
+    
   });
+
+  if (coords.length > 0) {  
+    const split_coords = coords.split(',');
+
+    var llon = [], llat = [], lcoordinate = [], lcoordinates = [] , lcolor = [];
+    
+    for (var i = 0; i < split_coords.length; i++) {
+      if (i % 2 === 0) {
+        llon.push(split_coords[i]);
+      } else {
+        llat.push(split_coords[i]);
+      }
+    }
+
+    for (var i = 0; i < llon.length; i++) {
+      lcoordinate.push([llon[i], llat[i]]);
+    }
+
+    const lgeojson = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: lcoordinate
+          }
+        }
+      ]
+    };
+
+    useEffect(() => {
+      map.current.on('load', () => {
+        map.current.addSource('route', {
+          type: 'geojson',
+          data: lgeojson
+        });
+        map.current.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#BF93E4',
+            'line-width': 5
+          }
+        });
+      });
+    });
+  }
+
 
   return (
     <div className="container">

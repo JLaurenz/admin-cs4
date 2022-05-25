@@ -100,34 +100,7 @@ export default function Home() {
       }
     });
   });
- useEffect(() => {
-       // add source to the map
-       map.current.addSource('route', {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: [ geojson ]
-          }
-        }
-      });
-      // add the layer to the map
-      map.current.addLayer({
-        id: 'route',
-        type: 'line',
-        source: 'route',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        paint: {
-          'line-color': '#888',
-          'line-width': 8
-        }
-      });
-    }, [geojson]);
+ 
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
@@ -154,10 +127,8 @@ export default function Home() {
     base1.setPopup(new mapboxgl.Popup({ offset: 25 })
       .setHTML(`<h3>J&T</h3><p>Sta Cruz</p>`))
     base1.addTo(map.current);
-    
-
+      
   });
-
 
   return (
     <div className="container">

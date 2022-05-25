@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Add a polygon to a map using a GeoJSON source</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+        <style>
+            body { margin: 0; padding: 0; }
+            #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+            mapboxgl.accessToken = 'pk.eyJ1Ijoic2VhbXN1cXIiLCJhIjoiY2wxOXc4Y3QwMTIzazNqbnd3ZXYyNmZsMyJ9.8QvIQjNW74qt9aE6K-6b7A';
+            const map = new mapboxgl.Map({
+                container: 'map', // container ID
+                style: 'mapbox://styles/mapbox/light-v10', // style URL
+                center: [121.41407412831579, 14.279915937895204], // starting position
+                zoom: 10 // starting zoom
+            });
+            
+            const split_coords = coords.split(","); //coords: ito yung string na galing sa database
+
+            var lon = [], lat = [], coordinate = [], coordinates = [];
+
+            for(var i=0; i<split_coords.length; i++){
+                if(i%2 == 0){
+                    lon.push(parseFloat(split_coords[i]));
+                } else {
+                    lat.push(parseFloat(split_coords[i]));
+                }
+            }
+
+            for(var j=0; j<lon.length-1; j++){
+                coordinate.push(lon[j]);
+                coordinate.push(lat[j]);
+                coordinates.push(coordinate);
+                console.log(coordinate);
+                coordinate = [];
+            }
+
+            const geojson = {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': coordinates
+                        }
+                    }
+                ]
+            };
+
+            map.on('load', () => {
+            // Add a data source containing GeoJSON data.
+                map.addSource('LineString', {
+                    'type': 'geojson',
+                    'data': geojson
+                });
+
+                map.addLayer({
+                    'id': 'LineString',
+                    'type': 'line',
+                    'source': 'LineString',
+                    'layout': {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#BF93E4',
+                        'line-width': 5
+                    }
+                });
+            });
+        </script>
+    
+    </body>
+</html>

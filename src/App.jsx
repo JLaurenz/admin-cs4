@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './Styles/App.css';
 import Login from './pages/Login'
 import Register from './pages/Register';
