@@ -84,55 +84,6 @@ export default function Home() {
     });
 
   }, 1000);
-<<<<<<< HEAD
-
-=======
- 
-
-  coordinate.forEach(coordinate => {
-    console.log(coordinate.properties.route);
-    const {title, route, color} = coordinate;
-    geojson.push({
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates: route
-      },
-      properties: {
-        title: title,
-        color: color,
-      }
-    });
-  });
- useEffect(() => {
-       // add source to the map
-       map.current.addSource('route', {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: [ geojson ]
-          }
-        }
-      });
-      // add the layer to the map
-      map.current.addLayer({
-        id: 'route',
-        type: 'line',
-        source: 'route',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        paint: {
-          'line-color': '#888',
-          'line-width': 8
-        }
-      });
-    }, []);
->>>>>>> fd29558861938be15e19c5f523f52d8aa088672e
 
   useEffect(() => {
     if (map.current) return; 
