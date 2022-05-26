@@ -42,40 +42,40 @@
                 coordinate = [];
             }
 
-            const geojson = {
-                'type': 'FeatureCollection',
-                'features': [
-                    {
-                        'type': 'Feature',
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': coordinates
+                const geojson = {
+                    'type': 'FeatureCollection',
+                    'features': [
+                        {
+                            'type': 'Feature',
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': coordinates
+                            }
                         }
-                    }
-                ]
-            };
+                    ]
+                };
 
-            map.on('load', () => {
-            // Add a data source containing GeoJSON data.
-                map.addSource('LineString', {
-                    'type': 'geojson',
-                    'data': geojson
-                });
+                map.on('load', () => {
+                // Add a data source containing GeoJSON data.
+                    map.addSource('LineString', {
+                        'type': 'geojson',
+                        'data': geojson
+                    });
 
-                map.addLayer({
-                    'id': 'LineString',
-                    'type': 'line',
-                    'source': 'LineString',
-                    'layout': {
-                        'line-join': 'round',
-                        'line-cap': 'round'
-                    },
-                    'paint': {
-                        'line-color': '#BF93E4',
-                        'line-width': 5
-                    }
+                    map.addLayer({
+                        'id': 'LineString',
+                        'type': 'line',
+                        'source': 'LineString',
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#BF93E4',
+                            'line-width': 5
+                        }
+                    });
                 });
-            });
         </script>
     
     </body>

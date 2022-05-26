@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import { getDatabase, ref, onValue, DataSnapshot, set, child, get} from "firebase/database";
-import { NotListedLocation } from '@mui/icons-material';
+import { Mp, NotListedLocation } from '@mui/icons-material';
+import Split from 'react-split';
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2VhbXN1cXIiLCJhIjoiY2wxOXc4Y3QwMTIzazNqbnd3ZXYyNmZsMyJ9.8QvIQjNW74qt9aE6K-6b7A';
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
   const [lng, setLng] = useState('');
   const [lat, setLat] = useState('');
   const [zoom, setZoom] = useState('');
+  var routecord ;
 
   const linelocation = [];
   
@@ -18,8 +20,7 @@ export default function Home() {
   const ListMarker = [];
   const db = getDatabase();
   const coordinate =[];
-  const route = [];
-  const coords = [];
+  var lgeojson;
   const dbRef = ref(db, '/Online Riders'+ '/1234');
 
   onValue(dbRef, (snapshot) => {
@@ -41,14 +42,17 @@ export default function Home() {
             'marker-color': color,
             'marker-size': 'medium',
             'marker-symbol': 'marker',
-            'status': status,
-            'route': route
+            'status': status
           }
         });
+      }
+      if (route !== undefined){
+        routecord.push(route)
       }
     });
   });
 
+  //marker
   setInterval(() => {
     coordinate.forEach(coordinate => {
       const {title, description, 'marker-color': color, 'marker-size': size, 'marker-symbol': symbol} = coordinate.properties;
@@ -70,6 +74,7 @@ export default function Home() {
       }
       else {
         const newMarker = new mapboxgl.Marker({ color, size, symbol })
+        if (coordinate.geometry.coordinates === undefined || coordinate.geometry.coordinates === null ) { return }
         newMarker.setLngLat(coordinate.geometry.coordinates)
         newMarker.setPopup(new mapboxgl.Popup({ offset: 25 })
           .setHTML(`<h3>${title}</h3><p>${description}</p>`))
@@ -85,6 +90,42 @@ export default function Home() {
 
   }, 1000);
 
+  for(var k=0; k<routecord.length; k++){
+    const split_coords = routecord[k].split(","); //coords: ito yung string na galing sa database
+
+    var lon = [], llat = [], lcoordinate = [], lcoordinates = [];
+
+    for(var i=0; i<split_coords.length; i++){
+        if(i%2 == 0){
+            lon.push(parseFloat(split_coords[i]));
+        } else {
+            llat.push(parseFloat(split_coords[i]));
+        }
+    }
+
+    for(var j=0; j<lon.length-1; j++){
+        lcoordinate.push(lon[j]);
+        lcoordinate.push(llat[j]);
+        lcoordinates.push(lcoordinate);
+        console.log(lcoordinate);
+        lcoordinate = [];
+    }
+  }
+  
+  lgeojson = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: lcoordinates 
+        }
+      }
+    ]
+  };
+
+
   useEffect(() => {
     if (map.current) return; 
     map.current = new mapboxgl.Map({
@@ -93,6 +134,29 @@ export default function Home() {
     center: [121.5010, 14.3507],
     zoom: 11
     });
+
+    map.current.on('load', ()=> {
+      if(map.current.getSource('route')){
+        map.current.removeSource('route');
+      }
+      map.current.addSource('route', {
+        type: 'geojson',
+        data: lgeojson
+      });
+      map.current.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#BF93E4',
+          'line-width': 5
+        }
+      });
+    })
 
     if (!map.current) return;
     map.current.on('move', () => {
@@ -110,89 +174,8 @@ export default function Home() {
     base1.setLngLat([121.41402295374215 , 14.280144331354549]);
     base1.setPopup(new mapboxgl.Popup({ offset: 25 })
       .setHTML(`<h3>J&T</h3><p>Sta Cruz</p>`))
-    base1.addTo(map.current);
-    
-  });
-
-  // loop through the coordinates array and get the route property
-  // and add it to the route array
-  // const routeline = [];
-  // coordinate.forEach(coordinate => {
-  //   if (coordinate.hasOwnProperty('route')) {
-  //     routeline.push(coordinate.route);
-  //   }
-  // });
-
-  // const split_coords = routeline.split(',');
-
-  // console.log(split_coords);
-
-  // var llon = [], llat = [], lcoordinate = [], lcoordinates = [] , lcolor = [];
-  
-  // // push the coordinate route to coords
-  // linelocation.forEach(linelocation => {
-  //   const {title, coordinate, color} = linelocation;
-  //   lcoordinate.push(coordinate);
-  //   lcoordinates.push(coordinate);
-  //   lcolor.push(color);
-  // });
-  
-  // console.log(lcoordinate);
-  // for (var i = 0; i < split_coords.length; i++) {
-  //   if (i % 2 === 0) {
-  //     llon.push(split_coords[i]);
-  //   } else {
-  //     llat.push(split_coords[i]);
-  //   }
-  // }
-
-  //   for (var i = 0; i < llon.length; i++) {
-  //     lcoordinate.push([llon[i], llat[i]]);
-  //   }
-
-    const lgeojson = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'LineString',
-            coordinates: [
-              [121.41402295374215 , 14.280144331354549],
-              [121.41402295374215 , 15.280144331354549],
-              [121.41402295374215 , 16.280144331354549],
-              [121.41402295374215 , 17.280144331354549],
-              [121.41402295374215 , 18.280144331354549],
-              [121.41402295374215 , 19.280144331354549],
-            ]
-          }
-        }
-      ]
-    };
-
-    useEffect(() => {
-      map.current.on('load', () => {
-        map.current.addSource('route', {
-          type: 'geojson',
-          data: lgeojson
-        });
-        map.current.addLayer({
-          id: 'route',
-          type: 'line',
-          source: 'route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': '#BF93E4',
-            'line-width': 5
-          }
-        });
-      });
+    base1.addTo(map.current);    
     });
-  
-
 
   return (
     <div className="container">
@@ -201,4 +184,4 @@ export default function Home() {
       </div>
     </div>
   )
-} 
+}

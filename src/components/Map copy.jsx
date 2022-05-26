@@ -138,3 +138,65 @@ export default function Home() {
     </div>
   )
 } 
+
+
+
+var split_coords = 0 ;
+  coordinate.forEach (coordinate => {
+    const vroute = coordinate.properties.route
+    if (vroute !== undefined){
+    split_coords = vroute.split(",");
+    console.log(split_coords);
+    }
+  })
+  var llon = [], llat = [], lcoordinate = [], lcoordinates = [] , lcolor = [];
+    
+  for (var i = 0; i < split_coords.length; i++) {
+    if (i % 2 === 0) {
+      llon.push(parseFloat(split_coords[i]));
+    } else {
+      llat.push(parseFloat(split_coords[i]));
+    }
+  }
+  for (var j = 0; j < llon.length-1; j++) {
+    lcoordinate.push(llon[j]);
+    lcoordinate.push(llat[j]);
+    lcoordinates.push(lcoordinate);
+    console.log(lcoordinates)
+    lcoordinate = [];
+  }
+      
+  const lgeojson = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: lcoordinates
+        }
+      }
+    ]
+  };
+  
+  useEffect(()=> {
+    map.current.on('load', () =>{
+      map.current.addSource('route', {
+        type: 'geojson',
+        data: lgeojson
+      })
+      map.current.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#BF93E4',
+          'line-width': 5
+      }
+    })
+  });
+})
