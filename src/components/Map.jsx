@@ -12,7 +12,6 @@ export default function Home() {
   const [lng, setLng] = useState('');
   const [lat, setLat] = useState('');
   const [zoom, setZoom] = useState('');
-  var routecord ;
 
   const linelocation = [];
   
@@ -45,9 +44,6 @@ export default function Home() {
             'status': status
           }
         });
-      }
-      if (route !== undefined){
-        routecord.push(route)
       }
     });
   });
@@ -89,42 +85,6 @@ export default function Home() {
     });
 
   }, 1000);
-
-  for(var k=0; k<routecord.length; k++){
-    const split_coords = routecord[k].split(","); //coords: ito yung string na galing sa database
-
-    var lon = [], llat = [], lcoordinate = [], lcoordinates = [];
-
-    for(var i=0; i<split_coords.length; i++){
-        if(i%2 == 0){
-            lon.push(parseFloat(split_coords[i]));
-        } else {
-            llat.push(parseFloat(split_coords[i]));
-        }
-    }
-
-    for(var j=0; j<lon.length-1; j++){
-        lcoordinate.push(lon[j]);
-        lcoordinate.push(llat[j]);
-        lcoordinates.push(lcoordinate);
-        console.log(lcoordinate);
-        lcoordinate = [];
-    }
-  }
-  
-  lgeojson = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: lcoordinates 
-        }
-      }
-    ]
-  };
-
 
   useEffect(() => {
     if (map.current) return; 
